@@ -23,11 +23,12 @@ def add_border(input_image, output_image, border):
         e = img._getexif()       
         if e is not None:
             exif=dict(e.items())
-            orientation = exif[orientation] 
+            if orientation in exif:
+                orientation = exif[orientation] 
 
-            if orientation == 3:   img = img.transpose(Image.ROTATE_180)
-            elif orientation == 6: img = img.transpose(Image.ROTATE_270)
-            elif orientation == 8: img = img.transpose(Image.ROTATE_90)
+                if orientation == 3:   img = img.transpose(Image.ROTATE_180)
+                elif orientation == 6: img = img.transpose(Image.ROTATE_270)
+                elif orientation == 8: img = img.transpose(Image.ROTATE_90)
     # Resize
     img.thumbnail((1080, 1080), Image.ANTIALIAS)
 
@@ -38,7 +39,7 @@ def add_border(input_image, output_image, border):
     bimg = ImageOps.expand(img, border=((size-width)//2 + border, (size-height)//2 + border), fill='white')
     bimg.save(output_image)
 
-def walk_images(in_dir, our_dir, border):
+def walk_images(in_dir, out_dir, border):
     '''
     Iterates through images in a given directory and draws a white border around them.
 
