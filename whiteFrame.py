@@ -3,7 +3,7 @@ import glob
 import os
 import argparse
 
-def add_border(input_image, output_image, border):
+def add_border(input_image, out_dir, out_prefix, out_suffix, border):
     '''
     Draws a white border around an image. The resulting image will
     be a squared image keeping the aspect ratio of the input image.
@@ -30,13 +30,17 @@ def add_border(input_image, output_image, border):
                 elif orientation == 6: img = img.transpose(Image.ROTATE_270)
                 elif orientation == 8: img = img.transpose(Image.ROTATE_90)
     # Resize
-    img.thumbnail((1080, 1080), Image.ANTIALIAS)
+    img.thumbnail((2160, 2160), Image.ANTIALIAS)
 
     width, height = img.size
+    orientation = 'vertical_' if width < height else 'horizontal_' 
     size = max(width, height)
+
+    # Generate ouput path
+    output_image = out_dir + out_prefix + orientation + out_suffix
     
     # Add border
-    bimg = ImageOps.expand(img, border=((size-width)//2 + border, (size-height)//2 + border), fill='white')
+    bimg = ImageOps.expand(img, border=((size-width)//2 + border, (size-height)//2 + border), fill='white')    
     bimg.save(output_image)
 
 def walk_images(in_dir, out_dir, border):
@@ -51,7 +55,7 @@ def walk_images(in_dir, out_dir, border):
     images = glob.glob(in_dir + "/*.jpg")
     for i in images:
         head, tail = os.path.split(i)
-        add_border(i, output_image=out_dir + '/framed_' + tail, border=border)
+        add_border(i, out_dir=out_dir, out_prefix='/framed_', out_suffix=tail, border=border)
         print("Framed image " + i)
 
 def parse_args():
@@ -64,7 +68,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='test', fromfile_prefix_chars="@")
     parser.add_argument('-i', '--input_directory', default="./")
     parser.add_argument('-o', '--output_directory', default="./")
-    parser.add_argument('-b', '--border', type=int, default="30")
+    parser.add_argument('-b', '--border', type=int, default="25")
     args = parser.parse_args()
     return args
  
